@@ -223,8 +223,7 @@ textarea:focus-visible {
 .preview-badge,
 .verified-note,
 .match-score,
-.search-status,
-.constraint-promise {
+.search-status {
   font-size: 0.82rem;
   font-weight: 700;
 }
@@ -421,85 +420,11 @@ h3 {
   background: var(--color-primary);
 }
 
-.preferences {
-  margin-top: clamp(2.5rem, 5vw, 4rem);
-}
-
 .section-kicker {
   margin-bottom: 0.45rem;
   color: var(--color-primary);
   letter-spacing: 0.06em;
   text-transform: uppercase;
-}
-
-.preferences h2 {
-  font-size: clamp(1.3rem, 2vw, 1.75rem);
-}
-
-.preferences__description {
-  max-width: 42rem;
-  margin-top: var(--space-3);
-  color: var(--color-muted-foreground);
-}
-
-.chip-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.65rem;
-  margin-top: var(--space-5);
-}
-
-.preference-chip {
-  display: inline-flex;
-  min-height: 2.75rem;
-  align-items: center;
-  gap: 0.38rem;
-  border: 1px solid var(--color-border);
-  border-radius: 999px;
-  padding: 0.55rem 0.8rem;
-  background: var(--color-surface);
-  color: var(--color-muted-foreground);
-  font-size: 0.86rem;
-  font-weight: 650;
-  line-height: 1;
-  transition:
-    border-color var(--transition-fast),
-    background-color var(--transition-fast),
-    color var(--transition-fast),
-    box-shadow var(--transition-fast);
-}
-
-.preference-chip strong {
-  color: var(--color-foreground);
-  font-weight: 760;
-}
-
-.preference-chip:hover {
-  border-color: var(--color-primary);
-}
-
-.preference-chip--selected {
-  border-color: color-mix(in srgb, var(--color-primary) 52%, var(--color-border));
-  background: var(--color-surface-strong);
-  color: var(--color-primary);
-  box-shadow: 0 2px 0 color-mix(in srgb, var(--color-primary) 12%, transparent);
-}
-
-.constraint-promise {
-  display: flex;
-  max-width: 43rem;
-  align-items: flex-start;
-  gap: 0.4rem;
-  margin-top: var(--space-5);
-  color: var(--color-muted-foreground);
-  font-weight: 560;
-  line-height: 1.5;
-}
-
-.constraint-promise strong {
-  flex: 0 0 auto;
-  color: var(--color-foreground);
-  font-weight: 760;
 }
 
 .hero-layout__results {
@@ -807,14 +732,6 @@ h3 {
     align-self: flex-start;
   }
 
-  .constraint-promise {
-    display: block;
-  }
-
-  .constraint-promise strong {
-    display: block;
-    margin-bottom: 0.2rem;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

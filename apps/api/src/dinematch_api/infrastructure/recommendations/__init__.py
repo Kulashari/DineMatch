@@ -1,0 +1,1 @@
+"""Restaurant data-source adapters."""

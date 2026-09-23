@@ -10,15 +10,16 @@ The current implementation is a modular React + TypeScript interface that models
 the resume-defined experience:
 
 - Natural-language meal request, typed starting point, and optional browser location
-- Six visible preference signals: cuisine, budget, distance, rating, dietary needs,
-  and vibe
+- Natural-language constraint interpretation for cuisine, budget, distance, rating,
+  dietary needs, and vibe
 - A representative ranked shortlist with explanations and trade-offs
 - A five-step LangGraph-oriented request workflow: understand, retrieve, filter,
   rank, and validate
 - Persistent light/dark mode and keyboard-accessible controls
 
-It intentionally uses typed local fixtures until the FastAPI, LangGraph, PostgreSQL,
-and restaurant/geolocation/maps API integrations are available.
+The frontend still uses typed local fixtures until it is connected to the API. The
+new API runs the same workflow with an in-memory catalog until PostgreSQL and live
+restaurant, geolocation, and maps adapters are added.
 
 ## Run locally
 
@@ -42,6 +43,13 @@ apps/
       dinematch.core/            # Domain models and deterministic ranking rules
       dinematch.infrastructure/  # Mock fixtures, browser storage, and HTTP adapters
       dinematch.config/          # TypeScript, Vite, and Vite type configuration
+  api/                           # FastAPI and LangGraph backend package
+    src/dinematch_api/
+      api/                       # HTTP routes and Pydantic schemas
+      application/               # Use cases and ports
+      core/                      # Domain models and ranking rules
+      infrastructure/            # Provider and database adapters
+      graphs/                    # LangGraph workflow definitions
 ```
 
 Dependencies flow toward the center: UI calls application contracts, application

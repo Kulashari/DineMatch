@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import type {
   DiningRequest,
-  PreferenceKey,
   RecommendationService,
 } from "../../dinematch.application/recommendations/contracts";
 import type { CurrentLocationProvider } from "../../dinematch.application/location/ports/CurrentLocationProvider";
@@ -10,7 +9,6 @@ import type { ThemePreferenceStore } from "../../dinematch.application/theme/The
 import { BrandMark } from "../components/BrandMark";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { HeroSearch } from "../features/home/components/HeroSearch";
-import { PreferenceChips } from "../features/home/components/PreferenceChips";
 import { RecommendationPreview } from "../features/home/components/RecommendationPreview";
 import { defaultLocation, defaultPrompt, preferenceOptions } from "../features/home/homeDefaults";
 import { useCurrentLocation } from "../features/location/useCurrentLocation";
@@ -40,9 +38,6 @@ export function DineMatchApp({
     locationError,
     requestCurrentLocation,
   } = useCurrentLocation(currentLocationProvider);
-  const [selectedKeys, setSelectedKeys] = useState(
-    () => new Set(preferenceOptions.map((preference) => preference.key)),
-  );
   const initialRequest = useMemo<DiningRequest>(
     () => ({
       prompt: defaultPrompt,
@@ -63,30 +58,11 @@ export function DineMatchApp({
     () => recommendationService.interpretPreferences(prompt, preferenceOptions),
     [prompt, recommendationService],
   );
-  const selectedPreferences = useMemo(
-    () => interpretedPreferences.filter((preference) => selectedKeys.has(preference.key)),
-    [interpretedPreferences, selectedKeys],
-  );
-
-  function togglePreference(key: PreferenceKey) {
-    setSelectedKeys((currentKeys) => {
-      const nextKeys = new Set(currentKeys);
-
-      if (nextKeys.has(key)) {
-        nextKeys.delete(key);
-      } else {
-        nextKeys.add(key);
-      }
-
-      return nextKeys;
-    });
-  }
-
   function handleFindMatches() {
     findMatches({
       prompt,
       location,
-      constraints: selectedPreferences,
+      constraints: interpretedPreferences,
     });
   }
 
@@ -142,15 +118,6 @@ export function DineMatchApp({
                 prompt={prompt}
                 status={status}
               />
-              <PreferenceChips
-                onToggle={togglePreference}
-                options={interpretedPreferences}
-                selectedKeys={selectedKeys}
-              />
-              <p className="constraint-promise">
-                <strong>{selectedPreferences.length} preference signals selected.</strong>
-                Hard constraints stay hard - DineMatch will ask before relaxing one.
-              </p>
             </div>
             <div className="hero-layout__results">
               <RecommendationPreview
