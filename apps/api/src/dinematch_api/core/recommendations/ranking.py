@@ -4,7 +4,6 @@ from re import findall, search
 
 from dinematch_api.core.recommendations.models import RecommendationRequest, Restaurant
 
-
 _CUISINES = ("italian", "thai", "japanese", "korean", "mexican", "indian", "mediterranean")
 _PREFERENCE_SIGNALS = ("vegetarian", "vegan", "quiet", "date", "casual")
 
@@ -21,7 +20,9 @@ def _constraint_value(request: RecommendationRequest, key: str) -> str | None:
     return next((constraint.value for constraint in request.constraints if constraint.key == key), None)
 
 
-def _price_estimate(price: str) -> int:
+def _price_estimate(price: str) -> int | None:
+    if "unavailable" in price.lower():
+        return None
     return len(price) * 20
 
 
@@ -52,11 +53,19 @@ def rank_restaurants(
         restaurant
         for restaurant in candidates
         if (not selected_cuisine or _matches(restaurant, selected_cuisine))
-        and (not rating_value or restaurant.rating >= minimum_rating)
+        and (
+            not rating_value
+            or restaurant.rating is None
+            or restaurant.rating >= minimum_rating
+        )
         and (not distance_value or restaurant.walk_minutes <= max_walk_minutes)
-        and _price_estimate(restaurant.price) <= budget_cap
+        and (
+            _price_estimate(restaurant.price) is None
+            or _price_estimate(restaurant.price) <= budget_cap
+        )
         and (
             not dietary_value
+            or "unavailable" in restaurant.dietary_fit.lower()
             or _matches(restaurant, "vegan" if "vegan" in dietary_value.lower() else "vegetarian")
         )
     ]
@@ -66,8 +75,9 @@ def rank_restaurants(
         score = restaurant.match_score
         if requested_cuisine and _matches(restaurant, requested_cuisine):
             score += 18
+        score += max(0, 12 - restaurant.walk_minutes)
         score += sum(5 if _matches(restaurant, signal) else -8 for signal in _PREFERENCE_SIGNALS if signal in query)
         score += min(8, sum(4 for term in location_terms if _matches(restaurant, term)))
         ranked.append(replace(restaurant, match_score=min(98, max(55, score))))
 
-    return tuple(sorted(ranked, key=lambda restaurant: restaurant.match_score, reverse=True)[:3])
+    return tuple(sorted(ranked, key=lambda restaurant: (-restaurant.match_score, restaurant.walk_minutes))[:3])

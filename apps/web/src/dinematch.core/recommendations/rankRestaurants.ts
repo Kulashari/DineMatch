@@ -16,7 +16,11 @@ function getWalkMinutes(walkTime: string) {
   return Number.parseInt(walkTime, 10);
 }
 
-function getPriceEstimate(price: string) {
+function getPriceEstimate(price: string): number | null {
+  if (price.toLowerCase().includes("unavailable")) {
+    return null;
+  }
+
   return price.length * 20;
 }
 
@@ -62,11 +66,14 @@ export function rankRestaurants(
 
   const eligibleRestaurants = candidates.filter((restaurant) => {
     const matchesCuisine = !selectedCuisine || includesPreference(restaurant, selectedCuisine);
-    const matchesRating = !hasRatingConstraint || restaurant.rating >= minimumRating;
+    const matchesRating =
+      !hasRatingConstraint || restaurant.rating === null || restaurant.rating >= minimumRating;
     const matchesDistance = !hasDistanceConstraint || getWalkMinutes(restaurant.walkTime) <= maxWalkMinutes;
-    const matchesBudget = getPriceEstimate(restaurant.price) <= budgetCap;
+    const priceEstimate = getPriceEstimate(restaurant.price);
+    const matchesBudget = priceEstimate === null || priceEstimate <= budgetCap;
     const matchesDietary =
       !dietaryConstraint ||
+      restaurant.dietaryFit.toLowerCase().includes("unavailable") ||
       includesPreference(restaurant, dietaryConstraint.includes("vegan") ? "vegan" : "vegetarian");
 
     return matchesCuisine && matchesRating && matchesDistance && matchesBudget && matchesDietary;
@@ -86,7 +93,11 @@ export function rankRestaurants(
         }
       });
 
-      if (hasRatingConstraint && restaurant.rating >= minimumRating) {
+      if (
+        hasRatingConstraint &&
+        restaurant.rating !== null &&
+        restaurant.rating >= minimumRating
+      ) {
         score += 4;
       }
 
@@ -94,7 +105,8 @@ export function rankRestaurants(
         score += 4;
       }
 
-      if (Number.isFinite(budgetCap) && getPriceEstimate(restaurant.price) <= budgetCap) {
+      const priceEstimate = getPriceEstimate(restaurant.price);
+      if (Number.isFinite(budgetCap) && priceEstimate !== null && priceEstimate <= budgetCap) {
         score += 5;
       }
 

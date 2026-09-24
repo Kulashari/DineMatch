@@ -495,6 +495,22 @@ h3 {
   font-weight: 730;
 }
 
+.api-error {
+  margin-top: var(--space-4);
+  border: 1px solid color-mix(in srgb, #c2410c 48%, var(--color-border));
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  background: color-mix(in srgb, #fff7ed 88%, var(--color-surface));
+  color: #9a3412;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+[data-theme="dark"] .api-error {
+  background: color-mix(in srgb, #431407 45%, var(--color-surface));
+  color: #fdba74;
+}
+
 .spinner {
   animation: spin 1.15s linear infinite;
 }
@@ -623,6 +639,22 @@ h3 {
   color: var(--color-muted-foreground);
   font-size: 0.88rem;
   line-height: 1.55;
+}
+
+.data-quality-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.42rem;
+  margin-top: 0.75rem;
+  color: var(--color-muted-foreground);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.data-quality-note svg {
+  flex: 0 0 auto;
+  margin-top: 0.08rem;
+  color: var(--color-rating);
 }
 
 .restaurant-card__actions {

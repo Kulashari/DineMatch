@@ -18,7 +18,7 @@ def build_recommendation_graph(catalog: RestaurantCatalog):
     def retrieve_restaurants(state: RecommendationGraphState) -> RecommendationGraphState:
         return {
             **state,
-            "candidates": catalog.list_candidates(),
+            "candidates": catalog.list_candidates(state["request"]),
             "workflow": (*state["workflow"], "retrieve_restaurants"),
         }
 

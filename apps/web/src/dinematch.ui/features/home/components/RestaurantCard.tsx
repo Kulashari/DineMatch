@@ -1,4 +1,4 @@
-import { ChevronDown, MapPinned, ShieldCheck, Star } from "lucide-react";
+import { CircleAlert, ChevronDown, MapPinned, ShieldCheck, Star } from "lucide-react";
 import { useState } from "react";
 import type { Restaurant } from "../../../../dinematch.application/recommendations/contracts";
 
@@ -10,6 +10,11 @@ interface RestaurantCardProps {
 export function RestaurantCard({ restaurant, position }: RestaurantCardProps) {
   const [showDetails, setShowDetails] = useState(false);
   const detailsId = `${restaurant.id}-details`;
+  const unavailableDetails = [
+    restaurant.rating === null ? "rating" : null,
+    restaurant.price.toLowerCase().includes("unavailable") ? "price" : null,
+    restaurant.dietaryFit.toLowerCase().includes("unavailable") ? "dietary details" : null,
+  ].filter((detail): detail is string => detail !== null);
 
   return (
     <article className={`restaurant-card ${position === 1 ? "restaurant-card--featured" : ""}`}>
@@ -22,9 +27,22 @@ export function RestaurantCard({ restaurant, position }: RestaurantCardProps) {
           <h3>{restaurant.name}</h3>
           <p>{restaurant.cuisine} · {restaurant.price}</p>
         </div>
-        <span className="rating" aria-label={`${restaurant.rating} out of 5 rating`}>
-          <Star aria-hidden="true" fill="currentColor" size={15} strokeWidth={2} />
-          {restaurant.rating.toFixed(1)}
+        <span
+          className="rating"
+          aria-label={
+            restaurant.rating === null
+              ? "Rating unavailable"
+              : `${restaurant.rating} out of 5 rating`
+          }
+        >
+          {restaurant.rating === null ? (
+            "Unrated"
+          ) : (
+            <>
+              <Star aria-hidden="true" fill="currentColor" size={15} strokeWidth={2} />
+              {restaurant.rating.toFixed(1)}
+            </>
+          )}
         </span>
       </div>
       <ul className="restaurant-card__facts" aria-label={`${restaurant.name} details`}>
@@ -36,6 +54,15 @@ export function RestaurantCard({ restaurant, position }: RestaurantCardProps) {
         <span>Fit validation modeled in this prototype</span>
       </div>
       <p className="restaurant-card__rationale">{restaurant.rationale}</p>
+      {unavailableDetails.length > 0 && (
+        <p className="data-quality-note">
+          <CircleAlert aria-hidden="true" size={15} strokeWidth={2.2} />
+          <span>
+            <strong>Data trade-off:</strong> OpenStreetMap does not list this restaurant’s{" "}
+            {unavailableDetails.join(", ")}. Confirm before visiting.
+          </span>
+        </p>
+      )}
 
       <div className="restaurant-card__actions">
         <button

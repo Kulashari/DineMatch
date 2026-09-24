@@ -6,7 +6,6 @@ apps/web/dist/
 design-system/
 .env
 .env.*
-!.env.example
 *.tsbuildinfo
 __pycache__/
 *.py[cod]

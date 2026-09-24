@@ -1,10 +1,10 @@
-from dinematch_api.core.recommendations.models import Restaurant
+from dinematch_api.core.recommendations.models import RecommendationRequest, Restaurant
 
 
 class MockRestaurantCatalog:
     """Temporary data adapter until Google Places and PostgreSQL are connected."""
 
-    def list_candidates(self) -> tuple[Restaurant, ...]:
+    def list_candidates(self, _request: RecommendationRequest) -> tuple[Restaurant, ...]:
         return (
             Restaurant(
                 id="luna-trattoria",

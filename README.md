@@ -17,9 +17,10 @@ the resume-defined experience:
   rank, and validate
 - Persistent light/dark mode and keyboard-accessible controls
 
-The frontend still uses typed local fixtures until it is connected to the API. The
-new API runs the same workflow with an in-memory catalog until PostgreSQL and live
-restaurant, geolocation, and maps adapters are added.
+The frontend sends submitted requests to the FastAPI service, which runs the
+LangGraph workflow with an in-memory catalog until PostgreSQL and live restaurant,
+geolocation, and maps adapters are added. The initial cards are intentionally sample
+fixtures, so the landing page remains useful before a search is submitted.
 
 ## Run locally
 
@@ -27,6 +28,12 @@ restaurant, geolocation, and maps adapters are added.
 npm --prefix apps/web install
 npm --prefix apps/web run dev
 ```
+
+In a second PowerShell terminal, start the API from `apps/api` as documented in
+[`apps/api/README.md`](apps/api/README.md). The frontend calls
+`http://127.0.0.1:8000` by default. To use another URL, copy
+create an untracked `apps/web/.env.local` containing
+`VITE_API_BASE_URL=https://your-api.example.com`, then restart Vite.
 
 ## Project structure
 

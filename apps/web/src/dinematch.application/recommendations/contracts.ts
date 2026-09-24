@@ -18,5 +18,6 @@ export type { SearchLocation };
 
 export interface RecommendationService {
   interpretPreferences(prompt: string, defaults: PreferenceChip[]): PreferenceChip[];
-  recommend(request: DiningRequest): Restaurant[];
+  preview(request: DiningRequest): Restaurant[];
+  recommend(request: DiningRequest): Promise<Restaurant[]>;
 }

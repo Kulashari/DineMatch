@@ -50,6 +50,7 @@ export function DineMatchApp({
     hasSearched,
     isSearching,
     results,
+    searchError,
     status,
     findMatches,
   } = useRecommendationPreview(recommendationService, initialRequest);
@@ -124,6 +125,7 @@ export function DineMatchApp({
                 hasSearched={hasSearched}
                 isSearching={isSearching}
                 restaurants={results}
+                searchError={searchError}
               />
             </div>
           </div>

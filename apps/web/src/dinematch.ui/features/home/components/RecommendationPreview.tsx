@@ -6,12 +6,14 @@ interface RecommendationPreviewProps {
   hasSearched: boolean;
   isSearching: boolean;
   restaurants: Restaurant[];
+  searchError: string | null;
 }
 
 export function RecommendationPreview({
   hasSearched,
   isSearching,
   restaurants,
+  searchError,
 }: RecommendationPreviewProps) {
   return (
     <section className="recommendation-preview" aria-labelledby="shortlist-heading">
@@ -22,18 +24,25 @@ export function RecommendationPreview({
         </div>
         <span className="preview-badge">
           <BadgeCheck aria-hidden="true" size={16} strokeWidth={2.3} />
-          {hasSearched ? "Updated local preview" : "Local preview"}
+          {hasSearched ? "Live API result" : "Sample preview"}
         </span>
       </div>
       <p className="recommendation-preview__intro">
         {isSearching
-          ? "DineMatch is processing the same five steps the production recommendation graph will use."
-          : "Representative local fixtures show how DineMatch makes trade-offs visible before you decide where to go."}
+          ? "DineMatch is running its five-stage LangGraph recommendation workflow."
+          : hasSearched
+            ? "These recommendations came from the live FastAPI service."
+            : "Sample fixtures show how DineMatch makes trade-offs visible before you decide where to go."}
       </p>
       {isSearching && (
         <div className="preview-progress" role="status">
           <RefreshCw aria-hidden="true" className="spinner" size={16} strokeWidth={2.2} />
           Updating the shortlist…
+        </div>
+      )}
+      {searchError && (
+        <div className="api-error" role="alert">
+          <strong>Couldn’t update the shortlist.</strong> {searchError}
         </div>
       )}
       {restaurants.length > 0 ? (
@@ -48,17 +57,17 @@ export function RecommendationPreview({
         </div>
       ) : (
         <div className="empty-shortlist" role="status">
-          <h3>No local sample match yet.</h3>
+          <h3>No match yet.</h3>
           <p>
-            Nothing in this prototype catalog satisfies every active hard constraint.
+            Nothing in the current restaurant catalog satisfies every active hard constraint.
             DineMatch keeps those requirements intact instead of silently relaxing them.
           </p>
         </div>
       )}
       <p className="sample-disclaimer">
-        This prototype re-ranks local sample fixtures from your input and can capture
-        your device location. Live restaurant, map, and evidence validation data will
-        be connected through the FastAPI service.
+        Sample cards appear before your first search. New shortlists are requested from
+        the FastAPI service, which runs the LangGraph workflow with its current catalog.
+        Nearby searches use <a href="https://www.openstreetmap.org/copyright" rel="noreferrer" target="_blank">© OpenStreetMap contributors</a>.
       </p>
     </section>
   );

@@ -17,7 +17,7 @@ export interface Restaurant {
   name: string;
   cuisine: string;
   price: string;
-  rating: number;
+  rating: number | null;
   walkTime: string;
   dietaryFit: string;
   matchScore: number;

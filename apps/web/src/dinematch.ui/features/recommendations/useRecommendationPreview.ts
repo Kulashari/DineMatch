@@ -16,10 +16,12 @@ export function useRecommendationPreview(
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [hasNoMatches, setHasNoMatches] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const [results, setResults] = useState<Restaurant[]>(() =>
-    recommendationService.recommend(initialRequest),
+    recommendationService.preview(initialRequest),
   );
   const timersRef = useRef<number[]>([]);
+  const searchIdRef = useRef(0);
 
   useEffect(() => {
     return () => {
@@ -32,11 +34,14 @@ export function useRecommendationPreview(
     timersRef.current = [];
   }
 
-  function findMatches(request: DiningRequest) {
+  async function findMatches(request: DiningRequest) {
+    const searchId = searchIdRef.current + 1;
+    searchIdRef.current = searchId;
     clearTimers();
     setIsSearching(true);
     setHasSearched(false);
     setHasNoMatches(false);
+    setSearchError(null);
     setActiveStepIndex(0);
 
     recommendationWorkflowSteps.forEach((_, index) => {
@@ -47,25 +52,41 @@ export function useRecommendationPreview(
       timersRef.current.push(timer);
     });
 
-    const completeTimer = window.setTimeout(() => {
-      const rankedResults = recommendationService.recommend(request);
+    try {
+      const rankedResults = await recommendationService.recommend(request);
+
+      if (searchId !== searchIdRef.current) {
+        return;
+      }
 
       setResults(rankedResults);
       setHasNoMatches(rankedResults.length === 0);
-      setActiveStepIndex(null);
       setHasSearched(true);
-      setIsSearching(false);
-    }, recommendationWorkflowSteps.length * SEARCH_STEP_DELAY);
+    } catch (error) {
+      if (searchId !== searchIdRef.current) {
+        return;
+      }
 
-    timersRef.current.push(completeTimer);
+      setSearchError(
+        error instanceof Error ? error.message : "Unable to create a DineMatch shortlist.",
+      );
+    } finally {
+      if (searchId === searchIdRef.current) {
+        clearTimers();
+        setActiveStepIndex(null);
+        setIsSearching(false);
+      }
+    }
   }
 
   const status = isSearching
     ? `${recommendationWorkflowSteps[activeStepIndex ?? 0].label}: ${recommendationWorkflowSteps[activeStepIndex ?? 0].description}`
-    : hasSearched
+    : searchError
+      ? searchError
+      : hasSearched
       ? hasNoMatches
-        ? "No local sample fixtures meet every active hard constraint."
-        : "Your local sample shortlist was updated from the current request."
+        ? "No restaurants meet every active hard constraint."
+        : "Your live DineMatch shortlist is ready."
       : "Ready to turn your preferences into a shortlist.";
 
   return {
@@ -73,6 +94,7 @@ export function useRecommendationPreview(
     hasNoMatches,
     isSearching,
     results,
+    searchError,
     status,
     findMatches,
   };

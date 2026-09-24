@@ -65,7 +65,7 @@ class RestaurantBody(BaseModel):
     name: str
     cuisine: str
     price: str
-    rating: float
+    rating: float | None
     walk_minutes: int
     dietary_fit: str
     match_score: int
